@@ -1,0 +1,47 @@
+---
+title: "regressionanimedatamarkdown"
+output: html_document
+date: "2026-05-12"
+---
+
+
+```{r}
+anime_data = read.csv('/Users/boss/Downloads/ECO-590/assignment-three-update-Astriwen/anime_data_full copy.csv')
+ols = lm(score ~ episodes + log(members) + post.y2k + weighted.popularity, data=anime_data) #simple regressions with all my variables post.y2k which is a binary variable where 1 is after or during 2000 and 0 is before members is the amount of people who are signed up for that anime on the site weighted popularity is members/episodes
+summary(ols) 
+tv_anime_data = subset(anime_data, type == "TV") 
+ols_tv_anime = lm(score ~ episodes + log(members) + weighted.popularity + post.y2k, #same regression but for tv
+             data = tv_anime_data)
+
+
+summary(ols_tv_anime) #outputs the regression for tv anime
+
+ols_posty2k <- lm(score ~ episodes * post.y2k + log(members) + weighted.popularity, data = anime_data) #regressions comparing eras before and after 2000
+
+summary(ols_posty2k) #outputs regression for the one comparing before and after 2000
+
+stargazer(ols, ols_tv_anime, ols_posty2k, #stargazer to put it in a better format
+          type = "text",
+          title = "Regression Results: Anime Score Determinants",
+          column.labels = c("Full Sample", "TV Only", "Before Vs. After 2000"),
+          dep.var.labels = "Score",
+          digits = 3,
+          omit.stat = c("f", "ser"),
+          no.space = TRUE)
+
+hist(anime_data$episodes,  #histogram
+     main = "Distribution of Anime Episodes (0-100)", #title
+     xlab = "Number of Episodes", #x labelling
+     col = "steelblue",  #color
+     breaks = 500,       # Increase breaks to get more detail in the small range (gemini)
+     xlim = c(0, 50))   # This "zooms in" on the 0 to 100 range 
+
+
+# For the original ols regression we see that the relatioship regarding user score and the amount of episodes an anime has is
+#not statistically significant wih all of our controls. Members is statsitically significant but it seems to have a negligible effect on the score .
+#year is statistically significant so it shows that people rate more recent animes higher even if it is only by a little bit.
+#However statistically significant variable post.y2k shows that those animes during the 21st century are rated a bit lower than those before it as a group
+#episodes*high.score is not statistically signifcant showing that there is not that muuch of a difference on the effect of episodes for higher rated episodes vs lower rated episodes
+# R^2 is 37.69% so these variables are responsible or 37.69 percent of the variation in score
+```
+
